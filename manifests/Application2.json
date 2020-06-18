@@ -1,0 +1,62 @@
+{
+"application": "kt-session-app",
+"owner_name": "Ankit Kothari",
+"owner_email": "ankit.kothari@refinitiv.com",
+"version": "2.0",
+"asset_insight_id": "205111",
+"regions": ["eu-west-1"],
+"compute": {
+"containers": [
+{
+"name": "quote-container",
+"artifact": "a205111-appserver-quote-service",
+"build_tag": "2.0"
+}
+],
+"functions": [{
+"name": "quote-lambda",
+"source": "TestFunction.zip",
+"version": "1.0"
+}]
+},
+"resources": [
+{
+"s3": [
+{
+"bucket_name": "quote-data",
+"enable_versioning": "yes"
+}
+],
+"dynamodb": [
+{
+"table_name": "quote-example",
+"hash_key_name": "ID",
+"hash_key_type": "N",
+"range_key_name": "name",
+"range_key_type": "N",
+"ttl": {
+"enabled": "true",
+"attribute_name": "asset"
+},
+"local-indexes": [
+{
+"name": "quote-lsi-table-1",
+"range_key": "name",
+"projection_type": "INCLUDE",
+"non_key_attributes": ["asset"]
+}
+],
+"global-indexes": [
+{
+"name": "quote-gsi-table-1",
+"hash_key": "price",
+"range_key": "asset",
+"projection_type": "KEYS_ONLY",
+"non_key_attributes": ["asset"]
+}
+]
+}
+]
+}
+]
+}

@@ -1,0 +1,1053 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://refinitiv.com/manifest-master.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "additionalProperties": true,
+    "required": [
+        "application",
+        "owner_name",
+        "owner_email",
+        "version",
+        "regions",
+        "asset_insight_id",
+        "compute"
+    ],
+    "optional": [
+        "resources"
+    ],
+    "properties": {
+        "application": {
+            "$id": "#/properties/application",
+            "type": "string",
+            "title": "The Application Schema",
+            "description": "Required Field: The application name for the manifest to be deployed.",
+            "default": "",
+            "examples": [
+                "test-app-1"
+            ]
+        },
+        "owner_name": {
+            "$id": "#/properties/owner_name",
+            "type": "string",
+            "title": "The Owner_name Schema",
+            "description": "Required Field: Application Owner name",
+            "default": "",
+            "examples": [
+                "John Doe"
+            ]
+        },
+        "owner_email": {
+            "$id": "#/properties/owner_email",
+            "type": "string",
+            "title": "The Owner_email Schema",
+            "description": "Required Field: Application Owner Email",
+            "default": "",
+            "examples": [
+                "john.doe@refinitiv.com"
+            ]
+        },
+        "version": {
+            "$id": "#/properties/version",
+            "type": "string",
+            "title": "The Version Schema",
+            "description": "Required Field: Application Version to be deployed",
+            "default": "",
+            "examples": [
+                "4.0"
+            ]
+        },
+        "regions": {
+            "$id": "#/properties/regions",
+            "type": "array",
+            "title": "The Regions Schema",
+            "description": " Optional field, If no region is provided, we support deploying to all regions. Regions in which the application can be deployed. We support multiple region deployment.",
+            "default": [
+                "us-east-1",
+                "eu-west-1",
+                "ap-southeast-1"
+            ],
+            "examples": [
+                [
+                    "eu-west-1",
+                    "us-west-2"
+                ]
+            ]
+        },
+        "asset_insight_id": {
+            "$id": "#/properties/asset_insight_id",
+            "type": "string",
+            "title": "The Asset_insight_id Schema",
+            "description": "Required Field: Application Asset Id as generated for application by Insight ",
+            "default": "",
+            "examples": [
+                "205111"
+            ]
+        },
+        "compute": {
+            "$id": "#/properties/compute",
+            "type": "object",
+            "title": "The Compute Schema",
+            "description": "A compute resource could be a containers, lambda functions that make up the application. ",
+            "default": {},
+            "examples": [
+                {
+                    "functions": [
+                        {
+                            "schedule": {
+                                "type": "fixed_interval",
+                                "value": "5",
+                                "unit": "days|hours|minutes"
+                            },
+                            "version": "3.0",
+                            "source": "Testfunction.zip",
+                            "name": "quote-test"
+                        },
+                        {
+                            "source": "Testfunction.zip",
+                            "name": "service-test",
+                            "schedule": {
+                                "unit": "",
+                                "type": "cron_expression",
+                                "value": "cron(0 10 * * ? *)"
+                            },
+                            "version": "1.0",
+                            "custom_alarm": [
+                                {
+                                    "alarm_description": "Memoryusageishigh",
+                                    "alarm_name": "HighMemoryUsage",
+                                    "comparison_operator": "GreaterThanThreshold",
+                                    "metric_name": "MemoryUsage",
+                                    "period": 60,
+                                    "threshold": 65,
+                                    "statistic": "What function to use for aggregating. 'Minimum' | 'min' - “Maximum” | “max” - “Average” | “avg” - “Sum” | “sum” - “SampleCount | “n” - “pNN.NN” ",
+                                    "evaluate_low_sample_count_percentile": "Optiona: Specifies whether to evaluate the data and potentially change the alarm state if there are too few data points to be statistically significant. Used only for alarms that are based on percentiles"
+                                }
+                            ]
+                        }
+                    ],
+                    "containers": [
+                        {
+                            "name": "quote-service",
+                            "artifact": "a205111-appserver-quote-service1",
+                            "build_tag": "1.0",
+                            "schedule": {
+                                "unit": "days|hours|minutes",
+                                "type": "fixed_interval",
+                                "value": "5"
+                            }
+                        },
+                        {
+                            "build_tag": "1.0",
+                            "schedule": {
+                                "value": "cron(0 10 * * ? *)",
+                                "unit": "",
+                                "type": "cron_expression"
+                            },
+                            "name": "quote-service2",
+                            "artifact": "a205111-appserver-quote-service2"
+                        }
+                    ]
+                }
+            ],
+            "additionalProperties": true,
+            "optional": [
+                "containers",
+                "functions"
+            ],
+            "properties": {
+                "containers": {
+                    "$id": "#/properties/compute/properties/containers",
+                    "type": "array",
+                    "title": "The Containers Schema",
+                    "description": "If application service is containerized, then container image can be deployed. A container image can be scheduled to run in fixed interval with days, hours and minutes as unit of schedule. Container image can be scheduled to run based on cron expression as well.",
+                    "default": [],
+                    "examples": [
+                        [
+                            {
+                                "name": "quote-service",
+                                "artifact": "a205111-appserver-quote-service1",
+                                "build_tag": "1.0",
+                                "schedule": {
+                                    "type": "fixed_interval",
+                                    "value": "5",
+                                    "unit": "days|hours|minutes"
+                                }
+                            },
+                            {
+                                "schedule": {
+                                    "type": "cron_expression",
+                                    "value": "cron(0 10 * * ? *)",
+                                    "unit": ""
+                                },
+                                "name": "quote-service2",
+                                "artifact": "a205111-appserver-quote-service2",
+                                "build_tag": "1.0"
+                            }
+                        ]
+                    ],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/compute/properties/containers/items",
+                        "type": "object",
+                        "title": "The Items Schema",
+                        "description": "Tag of Container image in ECR or Dockerhub ",
+                        "default": {},
+                        "examples": [
+                            {
+                                "build_tag": "1.0",
+                                "schedule": {
+                                    "type": "fixed_interval",
+                                    "value": "5",
+                                    "unit": "days|hours|minutes"
+                                },
+                                "name": "quote-service",
+                                "artifact": "a205111-appserver-quote-service1"
+                            },
+                            {
+                                "schedule": {
+                                    "unit": "",
+                                    "type": "cron_expression",
+                                    "value": "cron(0 10 * * ? *)"
+                                },
+                                "name": "quote-service2",
+                                "artifact": "a205111-appserver-quote-service2",
+                                "build_tag": "1.0"
+                            }
+                        ],
+                        "additionalProperties": true,
+                        "required": [
+                            "name",
+                            "artifact",
+                            "build_tag"
+                        ],
+                        "optional": [
+                            "schedule"
+                        ],
+                        "properties": {
+                            "name": {
+                                "$id": "#/properties/compute/properties/containers/items/properties/name",
+                                "type": "string",
+                                "title": "The Name Schema",
+                                "description": "Name of the container service that needs to be deployed",
+                                "default": "",
+                                "examples": [
+                                    "quote-service"
+                                ]
+                            },
+                            "artifact": {
+                                "$id": "#/properties/compute/properties/containers/items/properties/artifact",
+                                "type": "string",
+                                "title": "The Artifact Schema",
+                                "description": "Image name from ECR or dockerhub or BAMS",
+                                "default": "",
+                                "examples": [
+                                    "a205111-appserver-quote-service1"
+                                ]
+                            },
+                            "build_tag": {
+                                "$id": "#/properties/compute/properties/containers/items/properties/build_tag",
+                                "type": "string",
+                                "title": "The Build_tag Schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "1.0"
+                                ]
+                            },
+                            "schedule": {
+                                "$id": "#/properties/compute/properties/containers/items/properties/schedule",
+                                "type": "object",
+                                "title": "The Schedule Schema",
+                                "description": "A container image or function can be scheduled to run in fixed interval or based on cron expression",
+                                "default": {},
+                                "examples": [
+                                    {
+                                        "type": "fixed_interval",
+                                        "value": "5",
+                                        "unit": "days|hours|minutes"
+                                    }
+                                ],
+                                "additionalProperties": true,
+                                "optional": [
+                                    "type",
+                                    "value",
+                                    "unit"
+                                ],
+                                "properties": {
+                                    "type": {
+                                        "$id": "#/properties/compute/properties/containers/items/properties/schedule/properties/type",
+                                        "type": "string",
+                                        "title": "The Type Schema",
+                                        "description": "Type to indicate fixed_interval or cron expression",
+                                        "default": "",
+                                        "examples": [
+                                            "fixed_interval"
+                                        ]
+                                    },
+                                    "value": {
+                                        "$id": "#/properties/compute/properties/containers/items/properties/schedule/properties/value",
+                                        "type": "string",
+                                        "title": "The Value Schema",
+                                        "description": "In case of fixed_interval, this field is numerical value. ",
+                                        "default": "",
+                                        "examples": [
+                                            "5"
+                                        ]
+                                    },
+                                    "unit": {
+                                        "$id": "#/properties/compute/properties/containers/items/properties/schedule/properties/unit",
+                                        "type": "string",
+                                        "title": "The Unit Schema",
+                                        "description": "In case of fixed_interval, unit could be days, hours or minutes. 'value' and 'unit' is considered to configure fixed_interval schedule event ",
+                                        "default": "",
+                                        "examples": [
+                                            "days|hours|minutes"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "functions": {
+                    "$id": "#/properties/compute/properties/functions",
+                    "type": "array",
+                    "title": "The Functions Schema",
+                    "description": "Schedule event for functions",
+                    "default": [],
+                    "examples": [
+                        [
+                            {
+                                "schedule": {
+                                    "type": "fixed_interval",
+                                    "value": "5",
+                                    "unit": "days|hours|minutes"
+                                },
+                                "version": "3.0",
+                                "source": "Testfunction.zip",
+                                "name": "quote-test"
+                            },
+                            {
+                                "version": "1.0",
+                                "source": "Testfunction.zip",
+                                "name": "service-test",
+                                "schedule": {
+                                    "value": "cron(0 10 * * ? *)",
+                                    "unit": "",
+                                    "type": "cron_expression"
+                                }
+                            }
+                        ]
+                    ],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/compute/properties/functions/items",
+                        "type": "object",
+                        "title": "The Items Schema",
+                        "description": "Functions can be scheduled to run on a fixed interval or in intervals as defined by cron expression.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "schedule": {
+                                    "value": "5",
+                                    "unit": "days|hours|minutes",
+                                    "type": "fixed_interval"
+                                },
+                                "version": "3.0",
+                                "source": "Testfunction.zip",
+                                "name": "quote-test"
+                            },
+                            {
+                                "version": "1.0",
+                                "source": "Testfunction.zip",
+                                "name": "service-test",
+                                "schedule": {
+                                    "value": "cron(0 10 * * ? *)",
+                                    "unit": "",
+                                    "type": "cron_expression"
+                                }
+                            }
+                        ],
+                        "additionalProperties": true,
+                        "optional": [
+                            "name",
+                            "source",
+                            "version",
+                            "schedule"
+                        ],
+                        "properties": {
+                            "name": {
+                                "$id": "#/properties/compute/properties/functions/items/properties/name",
+                                "type": "string",
+                                "title": "The Name Schema",
+                                "description": "The name of the function to be scheduled.",
+                                "default": "",
+                                "examples": [
+                                    "quote-test"
+                                ]
+                            },
+                            "source": {
+                                "$id": "#/properties/compute/properties/functions/items/properties/source",
+                                "type": "string",
+                                "title": "The Source Schema",
+                                "description": "The compressed file to be deployed for the lambda function",
+                                "default": "",
+                                "examples": [
+                                    "Testfunction.zip"
+                                ]
+                            },
+                            "version": {
+                                "$id": "#/properties/compute/properties/functions/items/properties/version",
+                                "type": "string",
+                                "title": "The Version Schema",
+                                "description": "The version of the function represented by the zip file",
+                                "default": "",
+                                "examples": [
+                                    "3.0"
+                                ]
+                            },
+                            "schedule": {
+                                "$id": "#/properties/compute/properties/functions/items/properties/schedule",
+                                "type": "object",
+                                "title": "The Schedule Schema",
+                                "description": "An optional schedule that can be used to trigger the function in fixed interval or as represented by cron expression.",
+                                "default": {},
+                                "examples": [
+                                    {
+                                        "unit": "days|hours|minutes",
+                                        "type": "fixed_interval",
+                                        "value": "5"
+                                    }
+                                ],
+                                "additionalProperties": true,
+                                "required": [
+                                    "type",
+                                    "value",
+                                    "unit"
+                                ],
+                                "properties": {
+                                    "type": {
+                                        "$id": "#/properties/compute/properties/functions/items/properties/schedule/properties/type",
+                                        "type": "string",
+                                        "title": "The Type Schema",
+                                        "description": "schedule can be fixed_interval or cron expression",
+                                        "default": "",
+                                        "examples": [
+                                            "fixed_interval"
+                                        ]
+                                    },
+                                    "value": {
+                                        "$id": "#/properties/compute/properties/functions/items/properties/schedule/properties/value",
+                                        "type": "string",
+                                        "title": "The Value Schema",
+                                        "description": "Value can be cron expression or a numerical value for fixed interval type",
+                                        "default": "",
+                                        "examples": [
+                                            "5"
+                                        ]
+                                    },
+                                    "unit": {
+                                        "$id": "#/properties/compute/properties/functions/items/properties/schedule/properties/unit",
+                                        "type": "string",
+                                        "title": "The Unit Schema",
+                                        "description": "In case of fixed interval the unit can be one of days or hours or minutes.",
+                                        "default": "",
+                                        "examples": [
+                                            "days|hours|minutes"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "resources": {
+            "$id": "#/properties/resources",
+            "type": "array",
+            "title": "The Resources Schema",
+            "description": "We currently support 2 app resoure types - s3 or dynamodb resources that the deployed application (containers or lambda functions can access to",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "dynamodb": [
+                            {
+                                "global-indexes": [
+                                    {
+                                        "range_key": "asset",
+                                        "name": "quote-gsi-table-1",
+                                        "projection_type": "KEYS_ONLY",
+                                        "hash_key": "price",
+                                        "non_key_attributes": [
+                                            "asset"
+                                        ]
+                                    }
+                                ],
+                                "local-indexes": [
+                                    {
+                                        "non_key_attributes": [
+                                            "asset"
+                                        ],
+                                        "range_key": "name",
+                                        "name": "quote-lsi-table-1",
+                                        "projection_type": "INCLUDE"
+                                    }
+                                ],
+                                "ttl": {
+                                    "attribute_name": "asset",
+                                    "enabled": "true"
+                                },
+                                "hash_key_name": "ID",
+                                "range_key_name": "name",
+                                "table_name": "quote-example",
+                                "hash_key_type": "N",
+                                "range_key_type": "N"
+                            }
+                        ],
+                        "s3": [
+                            {
+                                "enable_versioning": "yes",
+                                "bucket_name": "quote-asset"
+                            },
+                            {
+                                "enable_versioning": "no",
+                                "bucket_name": "ticker-asset"
+                            }
+                        ]
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/resources/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "description": "Schema for S3 or dynamodb. This can be expanded to other types",
+                "default": {},
+                "examples": [
+                    {
+                        "dynamodb": [
+                            {
+                                "global-indexes": [
+                                    {
+                                        "non_key_attributes": [
+                                            "asset"
+                                        ],
+                                        "range_key": "asset",
+                                        "name": "quote-gsi-table-1",
+                                        "projection_type": "KEYS_ONLY",
+                                        "hash_key": "price"
+                                    }
+                                ],
+                                "local-indexes": [
+                                    {
+                                        "range_key": "name",
+                                        "name": "quote-lsi-table-1",
+                                        "projection_type": "INCLUDE",
+                                        "non_key_attributes": [
+                                            "asset"
+                                        ]
+                                    }
+                                ],
+                                "hash_key_name": "ID",
+                                "ttl": {
+                                    "enabled": "true",
+                                    "attribute_name": "asset"
+                                },
+                                "range_key_name": "name",
+                                "table_name": "quote-example",
+                                "hash_key_type": "N",
+                                "range_key_type": "N"
+                            }
+                        ],
+                        "s3": [
+                            {
+                                "enable_versioning": "yes",
+                                "bucket_name": "quote-asset"
+                            },
+                            {
+                                "enable_versioning": "no",
+                                "bucket_name": "ticker-asset"
+                            }
+                        ]
+                    }
+                ],
+                "additionalProperties": true,
+                "required": [
+                    "s3",
+                    "dynamodb"
+                ],
+                "properties": {
+                    "s3": {
+                        "$id": "#/properties/resources/items/properties/s3",
+                        "type": "array",
+                        "title": "The S3 Schema",
+                        "description": "Application supported resoures s3 or dynamodb",
+                        "default": [],
+                        "examples": [
+                            [
+                                {
+                                    "enable_versioning": "yes",
+                                    "bucket_name": "quote-asset"
+                                },
+                                {
+                                    "enable_versioning": "no",
+                                    "bucket_name": "ticker-asset"
+                                }
+                            ]
+                        ],
+                        "additionalItems": true,
+                        "items": {
+                            "$id": "#/properties/resources/items/properties/s3/items",
+                            "type": "object",
+                            "title": "The Items Schema",
+                            "description": "Defines the bucket name and versioning flag to be enabled or disabled. other flags are internal",
+                            "default": {},
+                            "examples": [
+                                {
+                                    "enable_versioning": "yes",
+                                    "bucket_name": "quote-asset"
+                                },
+                                {
+                                    "enable_versioning": "no",
+                                    "bucket_name": "ticker-asset"
+                                }
+                            ],
+                            "additionalProperties": true,
+                            "required": [
+                                "bucket_name",
+                                "enable_versioning"
+                            ],
+                            "properties": {
+                                "bucket_name": {
+                                    "$id": "#/properties/resources/items/properties/s3/items/properties/bucket_name",
+                                    "type": "string",
+                                    "title": "The Bucket_name Schema",
+                                    "description": "Bucket name for the resource",
+                                    "default": "",
+                                    "examples": [
+                                        "quote-asset"
+                                    ]
+                                },
+                                "enable_versioning": {
+                                    "$id": "#/properties/resources/items/properties/s3/items/properties/enable_versioning",
+                                    "type": "string",
+                                    "title": "The Enable_versioning Schema",
+                                    "description": "Enable or disable versioning for the bucket",
+                                    "default": "",
+                                    "examples": [
+                                        "yes"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "dynamodb": {
+                        "$id": "#/properties/resources/items/properties/dynamodb",
+                        "type": "array",
+                        "title": "The Dynamodb Schema",
+                        "description": "The schema for dynamodb resources",
+                        "default": [],
+                        "examples": [
+                            [
+                                {
+                                    "local-indexes": [
+                                        {
+                                            "range_key": "name",
+                                            "name": "quote-lsi-table-1",
+                                            "projection_type": "INCLUDE",
+                                            "non_key_attributes": [
+                                                "asset"
+                                            ]
+                                        }
+                                    ],
+                                    "ttl": {
+                                        "enabled": "true",
+                                        "attribute_name": "asset"
+                                    },
+                                    "hash_key_name": "ID",
+                                    "range_key_name": "name",
+                                    "table_name": "quote-example",
+                                    "hash_key_type": "N",
+                                    "range_key_type": "N",
+                                    "global-indexes": [
+                                        {
+                                            "projection_type": "KEYS_ONLY",
+                                            "hash_key": "price",
+                                            "non_key_attributes": [
+                                                "asset"
+                                            ],
+                                            "range_key": "asset",
+                                            "name": "quote-gsi-table-1"
+                                        }
+                                    ]
+                                }
+                            ]
+                        ],
+                        "additionalItems": true,
+                        "items": {
+                            "$id": "#/properties/resources/items/properties/dynamodb/items",
+                            "type": "object",
+                            "title": "The Items Schema",
+                            "description": "Dynamodb resource parameters",
+                            "default": {},
+                            "examples": [
+                                {
+                                    "global-indexes": [
+                                        {
+                                            "hash_key": "price",
+                                            "non_key_attributes": [
+                                                "asset"
+                                            ],
+                                            "range_key": "asset",
+                                            "name": "quote-gsi-table-1",
+                                            "projection_type": "KEYS_ONLY"
+                                        }
+                                    ],
+                                    "local-indexes": [
+                                        {
+                                            "projection_type": "INCLUDE",
+                                            "non_key_attributes": [
+                                                "asset"
+                                            ],
+                                            "range_key": "name",
+                                            "name": "quote-lsi-table-1"
+                                        }
+                                    ],
+                                    "ttl": {
+                                        "enabled": "true",
+                                        "attribute_name": "asset"
+                                    },
+                                    "hash_key_name": "ID",
+                                    "range_key_name": "name",
+                                    "table_name": "quote-example",
+                                    "hash_key_type": "N",
+                                    "range_key_type": "N"
+                                }
+                            ],
+                            "additionalProperties": true,
+                            "required": [
+                                "table_name",
+                                "hash_key_name",
+                                "hash_key_type",
+                                "range_key_name",
+                                "range_key_type",
+                                "ttl",
+                                "local-indexes",
+                                "global-indexes"
+                            ],
+                            "properties": {
+                                "table_name": {
+                                    "$id": "#/properties/resources/items/properties/dynamodb/items/properties/table_name",
+                                    "type": "string",
+                                    "title": "The Table_name Schema",
+                                    "description": "Dynamodb Table name that application depends on",
+                                    "default": "",
+                                    "examples": [
+                                        "quote-example"
+                                    ]
+                                },
+                                "hash_key_name": {
+                                    "$id": "#/properties/resources/items/properties/dynamodb/items/properties/hash_key_name",
+                                    "type": "string",
+                                    "title": "The Hash_key_name Schema",
+                                    "description": "Hash Key or Partition key: A simple primary key, composed of one attribute known as the partition key. Attributes in DynamoDB are similar in many ways to fields or columns in other database systems.",
+                                    "default": "",
+                                    "examples": [
+                                        "ID"
+                                    ]
+                                },
+                                "hash_key_type": {
+                                    "$id": "#/properties/resources/items/properties/dynamodb/items/properties/hash_key_type",
+                                    "type": "string",
+                                    "title": "The Hash_key_type Schema",
+                                    "description": "Hash Key or Partition schema type Numeric or String or Binary",
+                                    "default": "",
+                                    "examples": [
+                                        "N"
+                                    ]
+                                },
+                                "range_key_name": {
+                                    "$id": "#/properties/resources/items/properties/dynamodb/items/properties/range_key_name",
+                                    "type": "string",
+                                    "title": "The Range_key_name Schema",
+                                    "description": "Partition key and (Range key) sort key: Referred to as a composite primary key, this type of key is composed of two attributes. The first attribute is the partition key, and the second attribute is the sort key. ",
+                                    "default": "",
+                                    "examples": [
+                                        "name"
+                                    ]
+                                },
+                                "range_key_type": {
+                                    "$id": "#/properties/resources/items/properties/dynamodb/items/properties/range_key_type",
+                                    "type": "string",
+                                    "title": "The Range_key_type Schema",
+                                    "description": "Range key or sort-key - Partition key and sort key: Referred to as a composite primary key, this type of key is composed of two attributes. The first attribute is the partition key, and the second attribute is the sort key. ",
+                                    "default": "",
+                                    "examples": [
+                                        "N"
+                                    ]
+                                },
+                                "ttl": {
+                                    "$id": "#/properties/resources/items/properties/dynamodb/items/properties/ttl",
+                                    "type": "object",
+                                    "title": "The Ttl Schema",
+                                    "description": "Time To Live (TTL) for DynamoDB allows you to define when items in a table expire so that they can be automatically deleted from the database. The advantage of using epoch format (Number) is that you can use the TTL feature and all filters.",
+                                    "default": {},
+                                    "examples": [
+                                        {
+                                            "enabled": "true",
+                                            "attribute_name": "asset"
+                                        }
+                                    ],
+                                    "additionalProperties": true,
+                                    "required": [
+                                        "enabled",
+                                        "attribute_name"
+                                    ],
+                                    "properties": {
+                                        "enabled": {
+                                            "$id": "#/properties/resources/items/properties/dynamodb/items/properties/ttl/properties/enabled",
+                                            "type": "string",
+                                            "title": "The Enabled Schema",
+                                            "description": "Time To Live (TTL) for DynamoDB allows you to define when items in a table expire so that they can be automatically deleted from the database. The advantage of using epoch format (Number) is that you can use the TTL feature and all filters.",
+                                            "default": "",
+                                            "examples": [
+                                                "true"
+                                            ]
+                                        },
+                                        "attribute_name": {
+                                            "$id": "#/properties/resources/items/properties/dynamodb/items/properties/ttl/properties/attribute_name",
+                                            "type": "string",
+                                            "title": "The Attribute_name Schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "asset"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "local-indexes": {
+                                    "$id": "#/properties/resources/items/properties/dynamodb/items/properties/local-indexes",
+                                    "type": "array",
+                                    "title": "The Local-indexes Schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "examples": [
+                                        [
+                                            {
+                                                "range_key": "name",
+                                                "name": "quote-lsi-table-1",
+                                                "projection_type": "INCLUDE",
+                                                "non_key_attributes": [
+                                                    "asset"
+                                                ]
+                                            }
+                                        ]
+                                    ],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/resources/items/properties/dynamodb/items/properties/localindexes/items",
+                                        "type": "object",
+                                        "title": "The Items Schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "examples": [
+                                            {
+                                                "range_key": "name",
+                                                "name": "quote-lsi-table-1",
+                                                "projection_type": "INCLUDE",
+                                                "non_key_attributes": [
+                                                    "asset"
+                                                ]
+                                            }
+                                        ],
+                                        "additionalProperties": true,
+                                        "required": [
+                                            "name",
+                                            "range_key",
+                                            "projection_type",
+                                            "non_key_attributes"
+                                        ],
+                                        "properties": {
+                                            "name": {
+                                                "$id": "#/properties/resources/items/properties/dynamodb/items/properties/localindexes/items/properties/name",
+                                                "type": "string",
+                                                "title": "The Name Schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": [
+                                                    "quote-lsi-table-1"
+                                                ]
+                                            },
+                                            "range_key": {
+                                                "$id": "#/properties/resources/items/properties/dynamodb/items/properties/localindexes/items/properties/range_key",
+                                                "type": "string",
+                                                "title": "The Range_key Schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": [
+                                                    "name"
+                                                ]
+                                            },
+                                            "projection_type": {
+                                                "$id": "#/properties/resources/items/properties/dynamodb/items/properties/localindexes/items/properties/projection_type",
+                                                "type": "string",
+                                                "title": "The Projection_type Schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": [
+                                                    "INCLUDE"
+                                                ]
+                                            },
+                                            "non_key_attributes": {
+                                                "$id": "#/properties/resources/items/properties/dynamodb/items/properties/localindexes/items/properties/non_key_attributes",
+                                                "type": "array",
+                                                "title": "The Non_key_attributes Schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": [],
+                                                "examples": [
+                                                    [
+                                                        "asset"
+                                                    ]
+                                                ],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "$id": "#/properties/resources/items/properties/dynamodb/items/properties/localindexes/items/properties/non_key_attributes/items",
+                                                    "type": "string",
+                                                    "title": "The Items Schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "asset"
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "global-indexes": {
+                                    "$id": "#/properties/resources/items/properties/dynamodb/items/properties/globalindexes",
+                                    "type": "array",
+                                    "title": "The Global-indexes Schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "examples": [
+                                        [
+                                            {
+                                                "range_key": "asset",
+                                                "name": "quote-gsi-table-1",
+                                                "projection_type": "KEYS_ONLY",
+                                                "hash_key": "price",
+                                                "non_key_attributes": [
+                                                    "asset"
+                                                ]
+                                            }
+                                        ]
+                                    ],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/resources/items/properties/dynamodb/items/properties/globalindexes/items",
+                                        "type": "object",
+                                        "title": "The Items Schema",
+                                        "description": "Global Secondary Indexes: Some applications might need to perform many kinds of queries, using a variety of different attributes as query criteria. To support these requirements, create one or more global secondary indexes and issue Query requests against these indexes in Amazon DynamoDB.",
+                                        "default": {},
+                                        "examples": [
+                                            {
+                                                "range_key": "asset",
+                                                "name": "quote-gsi-table-1",
+                                                "projection_type": "KEYS_ONLY",
+                                                "hash_key": "price",
+                                                "non_key_attributes": [
+                                                    "asset"
+                                                ]
+                                            }
+                                        ],
+                                        "additionalProperties": true,
+                                        "required": [
+                                            "name",
+                                            "hash_key",
+                                            "range_key",
+                                            "projection_type",
+                                            "non_key_attributes"
+                                        ],
+                                        "properties": {
+                                            "name": {
+                                                "$id": "#/properties/resources/items/properties/dynamodb/items/properties/globalindexes/items/properties/name",
+                                                "type": "string",
+                                                "title": "The Name Schema",
+                                                "description": "Global Secondary Indexe column Name",
+                                                "default": "",
+                                                "examples": [
+                                                    "quote-gsi-table-1"
+                                                ]
+                                            },
+                                            "hash_key": {
+                                                "$id": "#/properties/resources/items/properties/dynamodb/items/properties/globalindexes/items/properties/hash_key",
+                                                "type": "string",
+                                                "title": "The Hash_key Schema",
+                                                "description": "Global Secondary Indexe column Hash or partition key",
+                                                "default": "",
+                                                "examples": [
+                                                    "price"
+                                                ]
+                                            },
+                                            "range_key": {
+                                                "$id": "#/properties/resources/items/properties/dynamodb/items/properties/globalindexes/items/properties/range_key",
+                                                "type": "string",
+                                                "title": "The Range_key Schema",
+                                                "description": "Global Secondary Indexe column Range or Sort key",
+                                                "default": "",
+                                                "examples": [
+                                                    "asset"
+                                                ]
+                                            },
+                                            "projection_type": {
+                                                "$id": "#/properties/resources/items/properties/dynamodb/items/properties/globalindexes/items/properties/projection_type",
+                                                "type": "string",
+                                                "title": "The Projection_type Schema",
+                                                "description": "A projection is the set of attributes that is copied from a table into a secondary index. The partition key and sort key of the table are always projected into the index; you can project other attributes to support your application's query requirements. When you query an index, Amazon DynamoDB can access any attribute in the projection as if those attributes were in a table of their own.",
+                                                "default": "",
+                                                "examples": [
+                                                    "KEYS_ONLY"
+                                                ]
+                                            },
+                                            "non_key_attributes": {
+                                                "$id": "#/properties/resources/items/properties/dynamodb/items/properties/globalindexes/items/properties/non_key_attributes",
+                                                "type": "array",
+                                                "title": "The Non_key_attributes Schema",
+                                                "description": "DynamoDB provides three different options for this:\n\nKEYS_ONLY – Each item in the index consists only of the table partition key and sort key values, plus the index key values. The KEYS_ONLY option results in the smallest possible secondary index.\n\nINCLUDE – In addition to the attributes described in KEYS_ONLY, the secondary index will include other non-key attributes that you specify.\n\nALL – The secondary index includes all of the attributes from the source table. Because all of the table data is duplicated in the index, an ALL projection results in the largest possible secondary index.",
+                                                "default": [],
+                                                "examples": [
+                                                    [
+                                                        "asset"
+                                                    ]
+                                                ],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "$id": "#/properties/resources/items/properties/dynamodb/items/properties/globalindexes/items/properties/non_key_attributes/items",
+                                                    "type": "string",
+                                                    "title": "The Items Schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "asset"
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

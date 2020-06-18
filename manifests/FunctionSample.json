@@ -1,0 +1,25 @@
+{
+    "application": "test-lambda-app",
+    "owner_name": "Ankit Kothari",
+    "owner_email": "ankit.kothari@refinitiv.com",
+    "version": "1.0.0",
+    "regions": [
+        "eu-west-1"
+    ],
+    "asset_insight_id": "205111",
+    "compute": {
+        "functions": [
+            {
+                "name": "s3-scheduler",
+                "source": "LambdaS3Scheduler.zip",
+                "version": "2.0",
+                "schedule": {
+                    "type": "fixed_interval",
+                    "value": "2",
+                    "unit": "minutes"
+                }
+            }
+        ]
+    },
+    "resources": []
+}

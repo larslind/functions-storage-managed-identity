@@ -1,0 +1,24 @@
+{
+    "application": "test-app-scheduler-cron",
+    "owner_name": "Ankit Kothari",
+    "owner_email": "ankit.kothari@refinitiv.com",
+    "version": "2.0.0",
+    "regions": [
+        "eu-west-1"
+    ],
+    "asset_insight_id": "205111",
+    "compute": {
+        "containers": [
+            {
+                "name": "test-service",
+                "artifact": "a205111-test-app-image",
+                "build_tag": "4.0",
+                "schedule": {
+                    "type": "cron_expression",
+                    "value": "cron(0/10 * * * ? *)"
+                }
+            }
+        ]
+    },
+    "resources": []
+}

@@ -1,0 +1,118 @@
+{
+    "application": "sam-app",
+    "owner_name": "sam joe",
+    "owner_email": "sudhi.joe@refinitiv.com",
+    "version": "42.0.0",
+    "asset_insight_id": "205111",
+    "regions": [
+        "eu-west-1"
+    ],
+    "container_insights": "True",
+    "compute": {
+        "containers": [
+            {
+                "name": "quote-service",
+                "artifact": "a205111-appserver-quote-service",
+                "build_tag": "6.0",
+                "custom_alarms": [
+                    {
+                        "metric_name": "CPUUtilization",
+                        "alarm_name": "CPUUtilizationThreshold",
+                        "comparison_operator": "LessThanOrEqualToThreshold",
+                        "evaluation_periods": "1",
+                        "period": "300",
+                        "threshold": "1",
+                        "statistic": "Sum"
+                    },
+                    {
+                        "metric_name": "MemoryUtilization",
+                        "alarm_name": "MemoryUtilizationThreshold",
+                        "comparison_operator": "LessThanOrEqualToThreshold",
+                        "evaluation_periods": "1",
+                        "period": "300",
+                        "threshold": "1",
+                        "statistic": "Sum"
+                    }
+                ]
+            }
+        ],
+        "functions": [
+            {
+                "name": "quote-lambda",
+                "source": "TestFunction.zip",
+                "version": "1.0",
+                "custom_alarms": [
+                    {
+                        "metric_name": "Invocations",
+                        "alarm_name": "InvocationsThreshold",
+                        "comparison_operator": "GreaterThanThreshold",
+                        "evaluation_periods": "1",
+                        "period": "60",
+                        "threshold": "5",
+                        "statistic": "Average"
+                    }
+                ]
+            }
+        ]
+    },
+    "resources": [
+        {
+            "s3": [
+                {
+                    "bucket_name": "santi-bucket",
+                    "enable_versioning": "no"
+                }
+            ],
+            "efs": [
+                {
+                    "file_system_name": "example"
+                }
+            ],
+            "dynamodb": [
+                {
+                    "table_name": "exampledb",
+                    "hash_key_name": "ID",
+                    "hash_key_type": "N|B|S",
+                    "range_key_name": "name",
+                    "range_key_type": "S|N|B",
+                    "ttl": {
+                        "enabled": "true",
+                        "attribute_name": "attribute_name"
+                    },
+                    "lsi-list": [
+                        {
+                            "name": "lsi-table-1",
+                            "range_key": "name",
+                            "projection_type": "INCLUDE",
+                            "non_key_attributes": [
+                                "attribute-1"
+                            ]
+                        },
+                        {
+                            "name": "lsi-table-2",
+                            "range_key": "attribute-1",
+                            "projection_type": "KEYS_ONLY",
+                            "non_key_attributes": []
+                        }
+                    ],
+                    "gsi-list": [
+                        {
+                            "name": "gsi-table-1",
+                            "hash_key": "attribute-1",
+                            "range_key": "attribute-2",
+                            "projection_type": "KEYS_ONLY",
+                            "non_key_attributes": []
+                        },
+                        {
+                            "name": "gsi-table-2",
+                            "hash_key": "attribute-2",
+                            "range_key": "ID",
+                            "projection_type": "ALL",
+                            "non_key_attributes": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
